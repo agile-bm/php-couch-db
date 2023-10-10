@@ -1,0 +1,21 @@
+{
+    "name": "agile-bm/php-couch-db",
+    "description": "A php library that simplifies connecting and manageing Couch DB databases and documents.",
+    "type": "library",
+    "require": {
+        "guzzlehttp/guzzle": "7.7.x-dev"
+    },
+    "license": "MIT license",
+    "autoload": {
+        "psr-4": {
+            "AgileBm\\PhpCouchDb\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "mzakaria",
+            "email": "mzakaria@agilebm.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
