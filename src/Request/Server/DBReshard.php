@@ -2,20 +2,27 @@
 
 namespace AgileBM\PhpCouchDb\Request\Server;
 
-class Info extends \AgileBM\PhpCouchDb\Request\Request {
+class DBReshard extends \AgileBM\PhpCouchDb\Request\Request {
+
+    public function __construct() {
+        parent::__construct();
+    }
+
     public function GetMethod(): string {
         return 'GET';
     }
 
     public function GetURI(): string {
-        return '';
+        return '/_reshard'; 
     }
 
     public function GetOptions(): array {
-        return [
+        $arrOption = [
             'headers' => [
-                'Accept' => 'application/json'
+                'Accept' => 'application/json',
             ]
         ];
+
+        return $arrOption;
     }
 }

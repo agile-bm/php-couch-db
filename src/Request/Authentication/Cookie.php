@@ -18,7 +18,7 @@ class Cookie extends \AgileBM\PhpCouchDb\Request\Authentication\Authenticate {
 
     public function GetOptions(): array {
         return [
-            'header' => [
+            'headers' => [
                 'Content-Type' => 'application/x-www-form-urlencoded'
             ],
             'form_params' => [

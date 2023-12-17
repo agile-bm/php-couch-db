@@ -13,7 +13,7 @@ class Basic extends \AgileBM\PhpCouchDb\Request\Authentication\Authenticate {
 
     public function GetOptions(): array {
         return [
-            'header' => [
+            'headers' => [
                 'Accept' => 'application/json'
             ],
             'auth' => [

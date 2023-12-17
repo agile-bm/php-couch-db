@@ -1,29 +1,28 @@
 <?php
 
 namespace AgileBM\PhpCouchDb\Request\Database;
-
 use AgileBM\PhpCouchDb\Request\Query;
 
-class AllDocs extends \AgileBM\PhpCouchDb\Request\Request {
+class GetDesignDocs extends \AgileBM\PhpCouchDb\Request\Request {
 
-    public function __construct(string $strDatabaseName, Query $objQuery = null) {
+    public function __construct(string $strDatabaseName, Query $objQuery) {
         $this->_data['strDatabaseName'] = (string)$strDatabaseName;
         $this->_data['objQuery'] = $objQuery;
         parent::__construct();
     }
 
     public function GetMethod(): string {
-        return 'POST';
+        return 'GET';
     }
 
     public function GetURI(): string {
-        return '/' . $this->_data['strDatabaseName'] . '/_all_docs';
+        return '/' . $this->_data['strDatabaseName'] . '/_design_docs';
     }
 
     public function GetOptions(): array {
         $arrOption = [
             'headers' => [
-                'Accept' => 'application/json'
+                'Accept' => 'application/json, text/plain'
             ]
         ];
 
@@ -32,23 +31,10 @@ class AllDocs extends \AgileBM\PhpCouchDb\Request\Request {
             $arrQuery = $this->_data['objQuery']->GetQuery();
 
             if (!empty($arrJson) || !empty($arrQuery)) {
-                $arrOption['json'] = array_merge($arrJson, $arrQuery);
+                $arrOption['query'] = array_merge($arrJson, $arrQuery);
             }
-
-            // if (!empty($arrQuery)) {
-            //     $arrOption['query'] = $arrQuery;
-            // }
-
-            // if (!empty($arrJson)) {
-            //     $arrOption['json'] = $arrJson;
-            // }
         }
-
-        if (!isset($arrOption['json'])) {
-            $arrOption['json'] = [
-                'sorted' => 'true',
-            ];
-        }
+        
         return $arrOption;
     }
 }

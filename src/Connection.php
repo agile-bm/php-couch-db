@@ -2,6 +2,8 @@
 
 namespace AgileBM\PhpCouchDb;
 
+use GuzzleHttp\Psr7\Uri;
+
 class Connection extends Base {
     private $_objClient = null;
     private $_objAuthenticator = null;
@@ -34,8 +36,12 @@ class Connection extends Base {
             if (!is_null($this->_objAuthenticator)) {
                 $objRequest->AddOption($this->_objAuthenticator->strKey, $this->_objAuthenticator->value);
             }
+            
+            // Partitioned document contains : and GuzzleHttp triggers an exception in this case
+            $strURI = new Uri($this->strBaseURI);
+            $strURI = $strURI->withPath($objRequest->strURI);
 
-            $objRslt = $this->_objClient->request($objRequest->strMethod, $objRequest->strURI, $objRequest->arrOption);
+            $objRslt = $this->_objClient->request($objRequest->strMethod, $strURI, $objRequest->arrOption);
             $objResponse = new Response();
             $objResponse->Load($objRslt->getStatusCode(), $objRslt->getReasonPhrase(), $objRslt->getBody()->getContents(), $objRslt->getHeaders());
             return $objResponse;

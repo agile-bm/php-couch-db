@@ -1,10 +1,19 @@
 <?php
 
-namespace AgileBM\PhpCouchDb\Request\Database;
+namespace AgileBM\PhpCouchDb\Request;
 
 class Query {
+    const FEED_PARAMETER_NORMAL = 'normal'; // Returns all historical DB changes, then closes the connection
+    const FEED_PARAMETER_LONGPOLL = 'longpoll'; // Closes the connection after the first event.
+    const FEED_PARAMETER_CONTINUOUS = 'continuous'; // Send a line of JSON per event. Keeps the socket open until timeout
+    const FEED_PARAMETER_EVENTSOURCE = 'eventsource'; // Like, continuous, but sends the events in EventSource format
+
+    const STYLE_MAIN_ONLY = 'main_only'; //will only return the current “winning” revision
+    const STYLE_ALL_DOCS = 'all_docs'; // will return all leaf revisions (including conflicts and deleted former conflicts)
+
     protected $_arrQuery = [];
     protected $_arrJson = [];
+
 
     public function __set($name, $value) {
         return false;
@@ -97,6 +106,128 @@ class Query {
     }
 
     /**
+     * Includes information about deleted conflicted revisions
+     * Default false
+     */
+    public function GetDeletedConflicts(): bool {
+        return (bool) $this->_arrQuery['deleted_conflicts'] ?? false;
+    }
+
+    /**
+     * Includes information about deleted conflicted revisions
+     * Default false
+     */
+    public function SetDeletedConflicts(bool $value) {
+        $this->_arrQuery['deleted_conflicts'] = $value;
+    }
+
+    /**
+     * Forces retrieving latest “leaf” revision, no matter what rev was requested
+     * Default false
+     */
+    public function GetLatest(): bool {
+        return (bool) $this->_arrQuery['latest'] ?? false;
+    }
+
+    /**
+     * Forces retrieving latest “leaf” revision, no matter what rev was requested
+     * Default false
+     */
+    public function SetLatest(bool $value) {
+        $this->_arrQuery['latest'] = $value;
+    }
+
+    /**
+     * Includes last update sequence for the document
+     * Default false
+     */
+    public function SetLocalSequence(bool $value) {
+        $this->_arrQuery['local_seq'] = $value;
+    }
+    /**
+     * Includes last update sequence for the document
+     * Default false
+     */
+    public function GetLocalSequence(): bool {
+        return (bool) $this->_arrQuery['local_seq'] ?? false;
+    }
+
+    /**
+     * Retrieves documents of specified leaf revisions
+     * use 'all' to return all leaf revisions
+     */
+    public function SetOpenRevs(array $value) {
+        $this->_arrQuery['open_revs'] = $value;
+    }
+    /**
+     * Retrieves documents of specified leaf revisions
+     * use 'all' to return all leaf revisions
+     */
+    public function GetOpenRevs(): array {
+        return (array) $this->_arrQuery['open_revs'] ?? null;
+    }
+
+    /**
+     * Retrieves document of specified revision
+     */
+    public function SetRev(string $value) {
+        $this->_arrQuery['rev'] = $value;
+    }
+    /**
+     * Retrieves document of specified revision
+     */
+    public function GetRev(): string {
+        return (string) $this->_arrQuery['rev'] ?? null;
+    }
+
+    /**
+     * Includes list of all known document revisions
+     * Default false
+     */
+    public function SetRevs(bool $value) {
+        $this->_arrQuery['revs'] = $value;
+    }
+    /**
+     * Includes list of all known document revisions
+     * Default false
+     */
+    public function GetRevs(): bool {
+        return (bool) $this->_arrQuery['revs'] ?? false;
+    }
+
+    /**
+     * Includes detailed information for all known document revisions
+     * Default false
+     */
+    public function SetRevsInfo(bool $value) {
+        $this->_arrQuery['revs_info'] = $value;
+    }
+    /**
+     * Includes detailed information for all known document revisions
+     * Default false
+     */
+    public function GetRevsInfo(): bool {
+        return (bool) $this->_arrQuery['revs_info'] ?? false;
+    }
+
+    /**
+     * Acts same as specifying all conflicts, deleted_conflicts and revs_info query parameters
+     * Default false
+     */
+    public function GetMeta(): bool {
+        return (bool) $this->_arrQuery['meta'] ?? false;
+    }
+
+    /**
+     * Acts same as specifying all conflicts, deleted_conflicts and revs_info query parameters
+     * Default false
+     */
+    public function SetMeta(bool $value) {
+        $this->_arrQuery['meta'] = $value;
+    }
+    
+
+    /**
      * Return the documents in descending order by key. Default is false.
      */
     public function GetDescending(): bool {
@@ -173,6 +304,24 @@ class Query {
     }
 
     /**
+     * Prevents insertion of a conflicting document.
+     * If false, a well-formed _rev must be included in the document
+     * Default true
+     */
+    public function GetNewEdits(): bool {
+        return (bool) $this->_arrQuery['new_edits'] ?? true;
+    }
+
+    /**
+     * Prevents insertion of a conflicting document.
+     * If false, a well-formed _rev must be included in the document
+     * Default true
+     */
+    public function SetNewEdits(bool $value) {
+        $this->_arrQuery['new_edits'] = $value;
+    }
+
+    /**
      * Include the associated document with each row. Default is false.
      */
     public function GetIncludeDocs(): bool {
@@ -228,6 +377,20 @@ class Query {
      */
     public function SetKeys(array $value) {
         $this->_arrJson['keys'] = $value;
+    }
+
+    /**
+     * Includes attachments only since specified revisions
+     */
+    public function GetAttsSince(): array {
+        return $this->_arrQuery['atts_since'] ?? [];
+    }
+
+    /**
+     * Includes attachments only since specified revisions
+     */
+    public function SetAttsSince(array $value) {
+        $this->_arrQuery['atts_since'] = $value;
     }
 
     /**
@@ -315,6 +478,22 @@ class Query {
     }
 
     /**
+     * Stores document in batch mode. Possible values: ok
+     */
+    public function GetBatchMode(): string {
+        return (string) $this->_arrQuery['batch'] ?? null;
+    }
+
+    /**
+     * Stores document in batch mode. Possible values: ok
+     */
+    public function SetBatch(bool $value) {
+        if ($value) {
+            $this->_arrQuery['batch'] = 'ok';
+        }
+    }
+
+    /**
      * Return records starting with the specified key.
      */
     public function GetStartKey(): string {
@@ -374,5 +553,166 @@ class Query {
      */
     public function SetUpdateSeq(bool $value) {
         $this->_arrQuery['update_seq'] = $value;
+    }
+
+    // API of Updates need this query parameter 
+    /**
+     * How to return the updates  
+     * Default is normal (FEED_PARAMETER_NORMAL)
+     */
+    public function GetFeed(): string {
+        return $this->_arrQuery['feed'] ?? self::FEED_PARAMETER_NORMAL;
+    }
+    
+    /**
+     * How to return the updates  
+     * Default is normal (FEED_PARAMETER_NORMAL)
+     */
+    public function SetFeed(string $value) {
+        $this->_arrQuery['feed'] = $value;
+    }
+
+    /**
+     * Number of milliseconds until CouchDB closes the connection.
+     * Default is 
+     */
+    public function GetTimeout(): int {
+        return $this->_arrQuery['timeout'] ?? 60000;
+    }
+
+    /**
+     * Number of milliseconds until CouchDB closes the connection.
+     * Default is 60000
+     */
+    public function SetTimeout(int $value) {
+        $this->_arrQuery['timeout'] = $value;
+    }
+
+    /**
+     * List of document IDs to filter the changes feed as valid JSON array.
+     */
+    public function GetDocIDs(): array {
+        return $this->_arrJson['doc_ids'] ?? null;
+    }
+
+    /**
+     * List of document IDs to filter the changes feed as valid JSON array.
+     */
+    public function SetDocIDs(array $value) {
+        $this->_arrJson['doc_ids'] = $value;
+    }
+    
+    /**
+     * Period in milliseconds after which an empty line is sent in the results
+     * Default is 60000
+     * Only applicable for longpoll, continuous, and eventsource feeds. Overrides any timeout to keep the feed alive indefinitely
+     */
+    public function GetHeartbeat (): int {
+        return $this->_arrQuery['heartbeat'] ?? 60000;
+    }
+
+    /**
+     * Period in milliseconds after which an empty line is sent in the results
+     * Default is 60000
+     * Only applicable for longpoll, continuous, and eventsource feeds. Overrides any timeout to keep the feed alive indefinitely
+     */
+    public function SetHeartbeat (int $value) {
+        $this->_arrQuery['heartbeat'] = $value;
+    }
+
+    /**
+     * Return only updates since the specified sequence ID 
+     * If the sequence ID is specified but does not exist, all changes are returned
+     * use 'now' to begin showing only new updates.
+     */
+    public function GetSince(): string {
+        return $this->_arrQuery['since'] ?? null;
+    }
+    
+    /**
+     * Return only updates since the specified sequence ID
+     * If the sequence ID is specified but does not exist, all changes are returned
+     * use 'now' to begin showing only new updates.
+     */
+    public function SetSince(string $value) {
+        $this->_arrQuery['since'] = $value;
+    }
+    /**
+     * ID of the last events received by the server on a previous connection
+     */
+    public function GetLastEventID(): int {
+        return $this->_arrQuery['last-event-id'] ?? null;
+    }
+    
+    /**
+     * ID of the last events received by the server on a previous connection
+     * 
+     */
+    public function SetLastEventID(int $value) {
+        $this->_arrQuery['last-event-id'] = $value;
+    }
+
+    /**
+     * Specifies how many revisions are returned in the changes array
+     * Default main_only
+     */
+    public function GetStyle(): string {
+        return $this->_arrQuery['style'] ?? 'main_only';
+    }
+    
+    /**
+     * Specifies how many revisions are returned in the changes array
+     * Default main_only
+     */
+    public function SetStyle(string $value) {
+        $this->_arrQuery['style'] = $value;
+    }
+
+    /**
+     * When fetching changes in a batch, setting the seq_interval parameter tells CouchDB to 
+     * only calculate the update seq with every Nth result returned
+     */
+    public function GetSeqInterval(): int {
+        return $this->_arrQuery['seq_interval'] ?? null;
+    }
+    
+    /**
+     * When fetching changes in a batch, setting the seq_interval parameter tells CouchDB to 
+     * only calculate the update seq with every Nth result returned
+     */
+    public function SetSeqInterval(int $value) {
+        $this->_arrQuery['seq_interval'] = $value;
+    }
+
+    /**
+     * When fetching changes in a batch, setting the filter parameter tells CouchDB to 
+     * only calculate the update seq with every Nth result returned
+     */
+    public function GetFilter(): string {
+        return $this->_arrQuery['filter'] ?? null;
+    }
+    
+    /**
+     * When fetching changes in a batch, setting the filter parameter tells CouchDB to 
+     * only calculate the update seq with every Nth result returned
+     */
+    public function SetFilter(string $value) {
+        $this->_arrQuery['filter'] = $value;
+    }
+
+    /**
+     * When fetching changes in a batch, setting the filter parameter tells CouchDB to 
+     * only calculate the update seq with every Nth result returned
+     */
+    public function SetSelector(array $value) {
+        $this->_arrQuery['selector'] = $value;
+    }
+
+    /**
+     * When fetching changes in a batch, setting the Selector parameter tells CouchDB to 
+     * only calculate the update seq with every Nth result returned
+     */
+    public function GetSelector(): array {
+        return $this->_arrQuery['selector'] ?? null;
     }
 }

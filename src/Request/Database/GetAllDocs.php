@@ -19,7 +19,7 @@ class GetAllDocs extends \AgileBM\PhpCouchDb\Request\Request {
 
     public function GetOptions(): array {
         return [
-            'header' => [
+            'headers' => [
                 'Accept' => 'application/json'
             ]
         ];

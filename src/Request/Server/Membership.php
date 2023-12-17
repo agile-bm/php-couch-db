@@ -1,21 +1,24 @@
 <?php
 
-namespace AgileBM\PhpCouchDb\Request\Authentication;
+namespace AgileBM\PhpCouchDb\Request\Server;
 
-class CookieInfo extends \AgileBM\PhpCouchDb\Request\Request {
+class Membership extends \AgileBM\PhpCouchDb\Request\Request {
+
     public function GetMethod(): string {
         return 'GET';
     }
 
     public function GetURI(): string {
-        return '/_session';
+        return '/_membership';
     }
 
     public function GetOptions(): array {
-        return [
+        $arrOption = [
             'headers' => [
                 'Accept' => 'application/json'
-            ]
+            ],
         ];
+
+        return $arrOption;
     }
 }

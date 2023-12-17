@@ -1,10 +1,9 @@
 <?php
 
 namespace AgileBM\PhpCouchDb\Request\Database;
-
 use AgileBM\PhpCouchDb\Request\Query;
 
-class AllDocs extends \AgileBM\PhpCouchDb\Request\Request {
+class DesignDocs extends \AgileBM\PhpCouchDb\Request\Request {
 
     public function __construct(string $strDatabaseName, Query $objQuery = null) {
         $this->_data['strDatabaseName'] = (string)$strDatabaseName;
@@ -17,7 +16,7 @@ class AllDocs extends \AgileBM\PhpCouchDb\Request\Request {
     }
 
     public function GetURI(): string {
-        return '/' . $this->_data['strDatabaseName'] . '/_all_docs';
+        return '/' . $this->_data['strDatabaseName'] . '/_design_docs';
     }
 
     public function GetOptions(): array {
@@ -34,20 +33,6 @@ class AllDocs extends \AgileBM\PhpCouchDb\Request\Request {
             if (!empty($arrJson) || !empty($arrQuery)) {
                 $arrOption['json'] = array_merge($arrJson, $arrQuery);
             }
-
-            // if (!empty($arrQuery)) {
-            //     $arrOption['query'] = $arrQuery;
-            // }
-
-            // if (!empty($arrJson)) {
-            //     $arrOption['json'] = $arrJson;
-            // }
-        }
-
-        if (!isset($arrOption['json'])) {
-            $arrOption['json'] = [
-                'sorted' => 'true',
-            ];
         }
         return $arrOption;
     }
